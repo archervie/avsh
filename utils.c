@@ -22,7 +22,6 @@ void print_prompt(void) {
     char cwd[PATH_MAX];
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        // e.g. displays: "[/home/user/wish] > " in bold cyan/green
         printf(ANSI_COLOR_BOLD ANSI_COLOR_CYAN "%s" ANSI_COLOR_GREEN " [avsh] > " ANSI_COLOR_RESET, cwd);
     } else {
         printf(ANSI_COLOR_BOLD ANSI_COLOR_GREEN "[avsh] > " ANSI_COLOR_RESET);
