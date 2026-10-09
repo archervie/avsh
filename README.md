@@ -10,6 +10,13 @@ Once you're in the shell, you can use it like a typical shell, being able to use
 
 You can exit the shell through `exit`. 
 
+## Parallel Commands
+You can run commands in parallel by using the `&` operator. For example:
+```
+cd /home/user & pwd
+>> /home/user
+```
+
 # Usage
 To use the shell, simply clone the repository and use `make`. 
 ```
