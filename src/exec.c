@@ -1,6 +1,6 @@
 #include "exec.h"
+#include "shell.h"
 #include "utils.h"
-#include "avsh.h"
 #include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -26,7 +26,7 @@ pid_t exec_cmd(int token_count, int redirection, char *line_tokens[],
             int fd = open(out_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
             if (fd == -1) {
                 error();
-                exit(EXIT_FAIL_CODE);
+                exit(EXIT_FAILURE);
             }
             dup2(fd, STDOUT_FILENO);
             dup2(fd, STDERR_FILENO);
@@ -38,7 +38,7 @@ pid_t exec_cmd(int token_count, int redirection, char *line_tokens[],
         free(full_path);
         path_cleanup(path);
         error();
-        exit(EXIT_FAIL_CODE);
+        exit(EXIT_FAILURE);
     } else {
         free(full_path);
         return rc;

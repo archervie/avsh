@@ -1,21 +1,12 @@
-#include "builtins.h"
-#include "exec.h"
-#include "utils.h"
-#include "avsh.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
-int default_path_set = 1;
-char *path[BUFF_SIZE] = {"/bin", NULL};
+#include "shell.h"
 
 int main(int argc, char *argv[]) {
+    char *path[BUFF_SIZE] = {"/bin", NULL};
     int batch_mode = 0;
     FILE *input = NULL;
 
     switch (argc) {
+
     case 1:
         input = stdin;
         batch_mode = 0;
@@ -25,14 +16,14 @@ int main(int argc, char *argv[]) {
         input = fopen(argv[1], "r");
         if (input == NULL) {
             error();
-            exit(EXIT_FAIL_CODE);
+            exit(EXIT_FAIL);
         }
         batch_mode = 1;
         break;
 
     default:
         error();
-        exit(EXIT_FAIL_CODE);
+        exit(EXIT_FAIL);
     }
 
     char *line = NULL;
@@ -40,7 +31,13 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         if (!batch_mode) {
-            print_prompt();
+            char cwd[BUFF_SIZE];
+            if (getcwd(cwd, sizeof(cwd)) != NULL) {
+                printf("%s> ", cwd);
+                fflush(stdout);
+            } else {
+                error();
+            }
         }
 
         ssize_t user_cmd = getline(&line, &len, input);
@@ -90,7 +87,8 @@ int main(int argc, char *argv[]) {
                 *redirection_ptr = '\0';
                 char *right_side = redirection_ptr + 1;
                 char *right_side_token;
-                while ((right_side_token = strsep(&right_side, " \t\n\r")) != NULL) {
+                while ((right_side_token = strsep(&right_side, " \t\n\r")) !=
+                       NULL) {
                     if (*right_side_token != '\0') {
                         if (right_token_count == 0) {
                             out_file = right_side_token;
@@ -108,7 +106,6 @@ int main(int argc, char *argv[]) {
 
             char *token;
             int token_count = 0;
-
             while ((token = strsep(&command_copy, " \t\n\r")) != NULL) {
                 if (*token != '\0') {
                     line_tokens[token_count++] = token;
@@ -125,24 +122,20 @@ int main(int argc, char *argv[]) {
                     free(orig_command_copy);
                     continue;
                 }
-
                 if (batch_mode) {
                     fclose(input);
                 }
-
                 free(line);
                 free(orig_command_copy);
                 path_cleanup(path);
-                exit(EXIT_SUCCESS_CODE);
-
+                exit(EXIT_SUCCESS);
             } else if (strcmp(line_tokens[0], "path") == 0) {
                 path_cmd(token_count, line_tokens, path);
-
             } else if (strcmp(line_tokens[0], "cd") == 0) {
                 cd(token_count, line_tokens);
-
             } else {
-                pid_t pid = exec_cmd(token_count, redirection, line_tokens, path, out_file);
+                pid_t pid = exec_cmd(token_count, redirection, line_tokens,
+                                     path, out_file);
                 if (pid == -1) {
                     error();
                     free(orig_command_copy);
@@ -165,5 +158,5 @@ int main(int argc, char *argv[]) {
 
     free(line);
     path_cleanup(path);
-    exit(EXIT_SUCCESS_CODE);
+    return EXIT_SUCCESS;
 }

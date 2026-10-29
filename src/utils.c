@@ -1,15 +1,15 @@
 #include "utils.h"
-#include "avsh.h"
+#include "shell.h"
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#define ANSI_COLOR_CYAN   "\x1b[36m"
-#define ANSI_COLOR_GREEN  "\x1b[32m"
-#define ANSI_COLOR_BOLD   "\x1b[1m"
-#define ANSI_COLOR_RESET  "\x1b[0m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_BOLD "\x1b[1m"
+#define ANSI_COLOR_RESET "\x1b[0m"
 
 extern int default_path_set;
 
@@ -22,7 +22,9 @@ void print_prompt(void) {
     char cwd[PATH_MAX];
 
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf(ANSI_COLOR_BOLD ANSI_COLOR_CYAN "%s" ANSI_COLOR_GREEN " [avsh] > " ANSI_COLOR_RESET, cwd);
+        printf(ANSI_COLOR_BOLD ANSI_COLOR_CYAN "%s" ANSI_COLOR_GREEN
+                                               " [avsh] > " ANSI_COLOR_RESET,
+               cwd);
     } else {
         printf(ANSI_COLOR_BOLD ANSI_COLOR_GREEN "[avsh] > " ANSI_COLOR_RESET);
     }

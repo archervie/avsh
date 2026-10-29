@@ -1,23 +1,30 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -O2
-TARGET = avsh
+CFLAGS = -Wall -Wextra -Werror -O2 -g -Iinclude
+TARGET = $(BIN_DIR)/avsh
 
-SRCS = avsh.c builtins.c exec.c utils.c
-OBJS = $(SRCS:.c=.o)
-HEADERS = avsh.h builtins.h exec.h utils.h
+SRC_DIR = src
+OBJ_DIR = obj
+BIN_DIR = bin
 
-all: $(TARGET)
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
+
+all: directories $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
-%.o: %.c $(HEADERS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+directories:
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(BIN_DIR)
+
 clean:
-	rm -f $(OBJS)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
-	rm -f $(TARGET)
+	rm -rf $(BIN_DIR)
 
-.PHONY: all clean
+.PHONY: all directories clean
